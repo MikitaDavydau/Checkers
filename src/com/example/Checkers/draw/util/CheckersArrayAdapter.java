@@ -26,7 +26,6 @@ public class CheckersArrayAdapter<T> extends ArrayAdapter<Squares> {
         this.playingBoard = objects;
         this.resource = resource;
         this.textViewResourceId = textViewResourceId;
-
     }
 
 
