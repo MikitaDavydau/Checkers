@@ -20,8 +20,18 @@ public class Squares {
     public Squares(String position, String color) {
         this.position = new Position(position);
         this.color = color;
+        this.allowedStep = false;
         this.crown = false;
         this.allowedSteps = new ArrayList<String>();
+    }
+
+    public Squares(String position, String color, Boolean piece) {
+        this.position = new Position(position);
+        this.color = color;
+        this.allowedStep = false;
+        this.crown = false;
+        this.allowedSteps = new ArrayList<String>();
+        this.piece = false;
     }
 
     public void calculateAllowedSteps(TreeMap<Integer, Squares> onlyBlackSquaresPlayingBoard) {
@@ -43,7 +53,7 @@ public class Squares {
         int positionToLeft = 0;
         int positionToRight = 0;
         /* по i мы еще не Дамка и можем ходить */
-        if (this.position.getI() > 1 && this.position.getI() < 7) {
+        if (this.position.getI() > 1 && this.position.getI() < 8) {
             if (this.position.getJ() > 0 && this.position.getJ() < 9) {
                 /* Добавляем к текущей позиции значение и проверием что на той клетке
                 * все равно мы тут проверяем наличие данной клетки, т.е. нам не надо
@@ -111,7 +121,6 @@ public class Squares {
                         }
                     } else {
                         allowedSteps.add(positionToLeft + "");
-                        this.allowedStep = true;
                     }
                 }
 
@@ -169,7 +178,6 @@ public class Squares {
                         }
                     } else {
                         allowedSteps.add(positionToRight + "");
-                        this.allowedStep = true;
                     }
                 }
             } else {
@@ -178,6 +186,7 @@ public class Squares {
         } else {
             /* если Шашка перешла на позицию Дамки */
         }
+        if (allowedSteps.size() > 0) this.allowedStep = true;
     }
 
     public void makePieceDie() {
@@ -210,10 +219,6 @@ public class Squares {
         this.crown = crown;
     }
 
-    public String toString() {
-        return position.getPosition();
-    }
-
     public boolean isAllowedStep() {
         return allowedStep;
     }
@@ -228,5 +233,9 @@ public class Squares {
 
     public void setPiece(boolean piece) {
         this.piece = piece;
+    }
+
+    public String toString() {
+        return position.getPosition();
     }
 }

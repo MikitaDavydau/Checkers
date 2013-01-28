@@ -22,6 +22,11 @@ public class MainActivity extends Activity {
     Squares fromSquares;
     Squares toSquares;
 
+    int yellowScore = 0;
+    int blueScore = 0;
+
+    String currentColor = Constants.YELLOW;
+
     GridView gvMain;
     CheckersArrayAdapter<String> adapter;
 
@@ -47,6 +52,8 @@ public class MainActivity extends Activity {
         gvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                //todo: тут делаем функцию, которая дает ходить только по очереди
                 Squares square = (Squares) adapterView.getItemAtPosition(i);
                 square.calculateAllowedSteps(blackSquaresPlayingBoard);
 
@@ -63,11 +70,12 @@ public class MainActivity extends Activity {
                     setAdapter();
                     gvMain.setAdapter(adapter);
 
+                    currentColor = (currentColor.equals(Constants.BLUE)) ? Constants.YELLOW : Constants.BLUE;
                     toSquares = null;
                     fromSquares = null;
                 }
 
-                fromSquares = (square.isPiece()) ? square : null;
+                fromSquares = (square.isPiece() && square.getColor().equals(currentColor)) ? square : null;
 
                 String toast = "";
                 if (square.getAllowedSteps().size() != 0) {
@@ -84,6 +92,7 @@ public class MainActivity extends Activity {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Squares square = (Squares) adapterView.getItemAtPosition(i);
+                //todo: create drag&drop action
                 return true;
             }
         });
@@ -96,36 +105,62 @@ public class MainActivity extends Activity {
         adapter = new CheckersArrayAdapter<String>(this, R.layout.item_black, R.id.tvText, new ArrayList<Squares>(playingBoard.values()));
     }
 
-
     private void adjustGridView() {
-        gvMain.setNumColumns(9);
+        gvMain.setNumColumns(10);
 //        gvMain.setColumnWidth(50);
         gvMain.setVerticalSpacing(5);
         gvMain.setHorizontalSpacing(5);
     }
 
     private void createTreeMapPlayingBoard() {
-        gridTwoDimensions = new String[9][9];
+        gridTwoDimensions = new String[10][10];
         playingBoard = new TreeMap<Integer, Squares>();
-
+        /* Заполнение будет построчное */
         int j = 0;
-        for (char a = 'a' - 1; a < 'i'; a++) {
-            for (int i = 0; i < 9; i++) {
+        for (char a = 'a' - 1; a < 'j'; a++) {
+            for (int i = 0; i < 10; i++) {
                 if (j == 0) {
                     if (i == 0) {
                         gridTwoDimensions[j][i] = "";
                         playingBoard.put(10 * j + i, new Squares("", ""));
+                    } else if (i == 9) {
+                        /* colorate right|left corner*/
+                        playingBoard.put(10 * j + i, new Squares("", Constants.SIMPLE));
                     } else {
                         gridTwoDimensions[j][i] = "" + i;
                         playingBoard.put(10 * j + i, new Squares("" + i, ""));
                     }
+                } else if (j == 9) {
+                    /* colorate down line*/
+                    switch (i) {
+                        case 1:
+                            playingBoard.put(10 * j + i, new Squares("Bl", Constants.SIMPLE));
+                            break;
+                        case 2:
+                        case 6:
+                            playingBoard.put(10 * j + i, new Squares("->", Constants.SIMPLE));
+                            break;
+                        case 3:
+                        case 7:
+                            playingBoard.put(10 * j + i, new Squares("$", Constants.SIMPLE));
+                            break;
+                        case 5:
+                            playingBoard.put(10 * j + i, new Squares("Yl", Constants.SIMPLE));
+                            break;
+                        default:
+                            playingBoard.put(10 * j + i, new Squares("", Constants.SIMPLE));
+                            break;
+                    }
+//                    playingBoard.put(10 * j + i, new Squares("S", Constants.SIMPLE));
                 } else {
                     if (i == 0) {
                         gridTwoDimensions[j][i] = a + "";
                         playingBoard.put(10 * j + i, new Squares(a + "", ""));
+                    } else if (i == 9) {
+                        /* colorate down */
+                        playingBoard.put(10 * j + i, new Squares("", Constants.SIMPLE));
                     } else {
                         gridTwoDimensions[j][i] = a + "" + i;
-
                         if ((i % 2 != 0 && j % 2 == 0) || (i % 2 == 0 && j % 2 != 0)) {
                             playingBoard.put(10 * j + i, new Squares(j + "" + i, Constants.BLACK));
                         } else {
@@ -148,18 +183,14 @@ public class MainActivity extends Activity {
     }
 
     private void createOnlyBlackSquaresAndPiecesPlayingBoard() {
-//        new Runnable() {
-//            @Override
-//            public void run() {
         blackSquaresPlayingBoard = new TreeMap<Integer, Squares>();
 
         for (Map.Entry<Integer, Squares> entry : playingBoard.entrySet()) {
-            if (!entry.getValue().getColor().equals(Constants.LIGHT) && !entry.getValue().getColor().equals(""))
+            if (!entry.getValue().getColor().equals(Constants.LIGHT) && !entry.getValue().getColor().equals("")) {
                 blackSquaresPlayingBoard.put(entry.getKey(), entry.getValue());
-        }
-//            }
-//        };
+            }
 
+        }
     }
 
     private void createOnlyBluePiecesPlayingBoard() {

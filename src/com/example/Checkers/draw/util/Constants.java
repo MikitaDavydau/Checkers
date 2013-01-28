@@ -5,4 +5,5 @@ public class Constants {
     public static final String LIGHT = "light";
     public static final String BLUE = "blue";
     public static final String YELLOW = "yellow";
+    public static final String SIMPLE = "simple";
 }
