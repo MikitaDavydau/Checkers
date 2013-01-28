@@ -53,38 +53,16 @@ public class MainActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                //todo: тут делаем функцию, которая дает ходить только по очереди
                 Squares square = (Squares) adapterView.getItemAtPosition(i);
                 square.calculateAllowedSteps(blackSquaresPlayingBoard);
 
                 if (fromSquares != null && !square.isPiece()) {
                     toSquares = (!square.isPiece()) ? square : null;
-
-                    /*Обновялем Игровой стол, чтобы его перерисовать*/
-                    playingBoard = adapter.swap(fromSquares, toSquares, playingBoard);
-
-                    /* Обновляем Черные клетки, которыми мы пользуемся для обозначения рабочей области */
-                    createOnlyBlackSquaresAndPiecesPlayingBoard();
-
-                    /* Устанавливаем adapter и обновляем поле */
-                    setAdapter();
-                    gvMain.setAdapter(adapter);
-
-                    currentColor = (currentColor.equals(Constants.BLUE)) ? Constants.YELLOW : Constants.BLUE;
-                    toSquares = null;
-                    fromSquares = null;
+                    updatePlayingInformationRewriteBoard();
                 }
-
                 fromSquares = (square.isPiece() && square.getColor().equals(currentColor)) ? square : null;
 
-                String toast = "";
-                if (square.getAllowedSteps().size() != 0) {
-                    toast = " can go to: ";
-                    for (int j = 0; j < square.getAllowedSteps().size(); j++) {
-                        toast += (square.getAllowedSteps().size() - j > 1) ? square.getAllowedSteps().get(j) + " or " : square.getAllowedSteps().get(j);
-                    }
-                }
-                makeToast("Item: " + adapterView.getItemAtPosition(i) + toast);
+                makeToast("Item: " + adapterView.getItemAtPosition(i) + createPositionToast(square));
             }
         });
 
@@ -101,9 +79,52 @@ public class MainActivity extends Activity {
         adjustGridView();
     }
 
+    private void updatePlayingInformationRewriteBoard() {
+        /*Обновялем Игровой стол, чтобы его перерисовать*/
+        playingBoard = adapter.swap(fromSquares, toSquares, playingBoard);
+
+        /* Обновляем Черные клетки, которыми мы пользуемся для обозначения рабочей области */
+        createOnlyBlackSquaresAndPiecesPlayingBoard();
+
+        /* Устанавливаем adapter и обновляем поле */
+        setAdapter();
+        gvMain.setAdapter(adapter);
+
+        changeCurrentColorResetFromTO();
+    }
+
+    private void createOnlyBlackSquaresAndPiecesPlayingBoard() {
+        blackSquaresPlayingBoard = new TreeMap<Integer, Squares>();
+
+        for (Map.Entry<Integer, Squares> entry : playingBoard.entrySet()) {
+            if (!entry.getValue().getColor().equals(Constants.LIGHT) && !entry.getValue().getColor().equals("")) {
+                blackSquaresPlayingBoard.put(entry.getKey(), entry.getValue());
+            }
+
+        }
+    }
+
     private void setAdapter() {
         adapter = new CheckersArrayAdapter<String>(this, R.layout.item_black, R.id.tvText, new ArrayList<Squares>(playingBoard.values()));
     }
+
+    private void changeCurrentColorResetFromTO() {
+        currentColor = (currentColor.equals(Constants.BLUE)) ? Constants.YELLOW : Constants.BLUE;
+        toSquares = null;
+        fromSquares = null;
+    }
+
+    private String createPositionToast(Squares square) {
+        String toast = "";
+        if (square.getAllowedSteps().size() != 0) {
+            toast = " can go to: ";
+            for (int j = 0; j < square.getAllowedSteps().size(); j++) {
+                toast += (square.getAllowedSteps().size() - j > 1) ? square.getAllowedSteps().get(j) + " or " : square.getAllowedSteps().get(j);
+            }
+        }
+        return toast;
+    }
+
 
     private void adjustGridView() {
         gvMain.setNumColumns(10);
@@ -151,7 +172,6 @@ public class MainActivity extends Activity {
                             playingBoard.put(10 * j + i, new Squares("", Constants.SIMPLE));
                             break;
                     }
-//                    playingBoard.put(10 * j + i, new Squares("S", Constants.SIMPLE));
                 } else {
                     if (i == 0) {
                         gridTwoDimensions[j][i] = a + "";
@@ -179,17 +199,6 @@ public class MainActivity extends Activity {
         for (Map.Entry<Integer, Squares> entry : playingBoard.entrySet()) {
             if (entry.getValue().getColor().equals(Constants.BLACK))
                 blackSquaresPlayingBoard.put(entry.getKey(), entry.getValue());
-        }
-    }
-
-    private void createOnlyBlackSquaresAndPiecesPlayingBoard() {
-        blackSquaresPlayingBoard = new TreeMap<Integer, Squares>();
-
-        for (Map.Entry<Integer, Squares> entry : playingBoard.entrySet()) {
-            if (!entry.getValue().getColor().equals(Constants.LIGHT) && !entry.getValue().getColor().equals("")) {
-                blackSquaresPlayingBoard.put(entry.getKey(), entry.getValue());
-            }
-
         }
     }
 
