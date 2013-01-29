@@ -11,7 +11,6 @@ import com.example.Checkers.R;
 import com.example.Checkers.draw.entity.Squares;
 
 import java.util.List;
-import java.util.TreeMap;
 
 public class CheckersArrayAdapter<T> extends ArrayAdapter<Squares> {
 
@@ -29,8 +28,9 @@ public class CheckersArrayAdapter<T> extends ArrayAdapter<Squares> {
     }
 
 
-    public TreeMap<Integer, Squares> swap(Squares fromSquare, Squares toSquare, TreeMap<Integer, Squares> playingBoard) {
+    public CheckersTreeMap<Integer, Squares> swap(Squares fromSquare, Squares toSquare, CheckersTreeMap<Integer, Squares> playingBoard) {
         boolean stepFlag = false;
+        playingBoard.setContentUpdate(false);
         if (playingBoard.containsValue(fromSquare) && playingBoard.containsValue(toSquare)) {
             if (fromSquare.isAllowedStep()) {
                 for (String s : fromSquare.getAllowedSteps()) {
@@ -64,9 +64,9 @@ public class CheckersArrayAdapter<T> extends ArrayAdapter<Squares> {
                             } else {
                                 position = from - ((from - to) / 2);
                             }
+                            playingBoard.setScoreUpdate(true);
                             playingBoard.get(position).makePieceDie();
                         }
-
                         stepFlag = true;
                     }
                 }
@@ -76,6 +76,7 @@ public class CheckersArrayAdapter<T> extends ArrayAdapter<Squares> {
         } else {
             makeToast("This coordinates is not contains");
         }
+        playingBoard.setContentUpdate(stepFlag);
         if (!stepFlag) makeToast("This is not allowed step");
         return playingBoard;
     }

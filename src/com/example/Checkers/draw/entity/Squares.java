@@ -25,21 +25,11 @@ public class Squares {
         this.allowedSteps = new ArrayList<String>();
     }
 
-    public Squares(String position, String color, Boolean piece) {
-        this.position = new Position(position);
-        this.color = color;
-        this.allowedStep = false;
-        this.crown = false;
-        this.allowedSteps = new ArrayList<String>();
-        this.piece = false;
-    }
-
     public void calculateAllowedSteps(TreeMap<Integer, Squares> onlyBlackSquaresPlayingBoard) {
         allowedSteps.clear();
         if (this.isPiece()) {
-            /* если у нас Дамка - другой расчет */
             if (this.isCrown()) {
-            /* пока еще не дамка и врядли ей станет */
+            /* если у нас Дамка - другой расчет */
             } else {
                 addAllowedSteps(onlyBlackSquaresPlayingBoard);
             }
@@ -47,138 +37,28 @@ public class Squares {
     }
 
     private void addAllowedSteps(TreeMap<Integer, Squares> onlyBlackSquaresPlayingBoard) {
-        Squares stepToLeftSquare;
-        Squares stepToRightSquare;
-
-        int positionToLeft = 0;
-        int positionToRight = 0;
+        int positionToLeft;
+        int positionToRight;
         /* по i мы еще не Дамка и можем ходить */
-        if (this.position.getI() > 1 && this.position.getI() < 8) {
-            if (this.position.getJ() > 0 && this.position.getJ() < 9) {
+        if (getI() > 1 && getI() < 8) {
+            if (getJ() > 0 && getJ() < 9) {
                 /* Добавляем к текущей позиции значение и проверием что на той клетке
                 * все равно мы тут проверяем наличие данной клетки, т.е. нам не надо
                 * узнавать в каких рамках находяться j*/
-                if (this.getColor().equals(Constants.BLUE)) {
-                    positionToLeft = (this.position.getI() + 1) * 10 + this.position.getJ() - 1;
-                    positionToRight = (this.position.getI() + 1) * 10 + this.position.getJ() + 1;
+                if (isBlue()) {
+                    positionToLeft = (getI() + 1) * 10 + getJ() - 1;
+                    positionToRight = (getI() + 1) * 10 + getJ() + 1;
                 } else {
-                    positionToLeft = (this.position.getI() - 1) * 10 + this.position.getJ() - 1;
-                    positionToRight = (this.position.getI() - 1) * 10 + this.position.getJ() + 1;
+                    positionToLeft = (getI() - 1) * 10 + getJ() - 1;
+                    positionToRight = (getI() - 1) * 10 + getJ() + 1;
                 }
 
                 if (onlyBlackSquaresPlayingBoard.containsKey(positionToLeft)) {
-                    stepToLeftSquare = onlyBlackSquaresPlayingBoard.get(positionToLeft);
-                    /* Мы нашли кого-то */
-                    if (stepToLeftSquare.isPiece()) {
-                        /* Если мы BLUE */
-                        if (this.getColor().equals(Constants.BLUE)) {
-                            /* Черт, это наш же */
-                            if (stepToLeftSquare.getColor().equals(Constants.BLUE)) {
-                                /* Ложная тревога */
-                            } else {
-                                /* Попался */
-                                /* Надо проверить: если ли куда ходит
-                                * меняем точку перехода*/
-                                positionToLeft = (this.position.getI() + 2) * 10 + this.position.getJ() - 2;
-                                /* Проверяем валидность точки */
-                                if (onlyBlackSquaresPlayingBoard.containsKey(positionToLeft)) {
-                                    /* Получаем значение данной клетки */
-                                    stepToLeftSquare = onlyBlackSquaresPlayingBoard.get(positionToLeft);
-                                    /* Если есть место */
-                                    if (!stepToLeftSquare.isPiece()) {
-                                        allowedSteps.add(positionToLeft + "");
-                                    } else {
-                                        /* Нету места */
-                                    }
-                                } else {
-                                    /* Такой позиции не существет */
-                                }
-                            }
-                        } else {
-                            /* если не BLUE */
-                            /* Черт, это наш же */
-                            if (stepToLeftSquare.getColor().equals(Constants.YELLOW)) {
-                                /* Ложная тревога */
-                            } else {
-                                /* Попался */
-                                /* Надо проверить: если ли куда ходит
-                                * меняем точку перехода*/
-                                positionToLeft = (this.position.getI() - 2) * 10 + this.position.getJ() - 2;
-                                /* Проверяем валидность точки */
-                                if (onlyBlackSquaresPlayingBoard.containsKey(positionToLeft)) {
-                                    /* Получаем значение данной клетки */
-                                    stepToLeftSquare = onlyBlackSquaresPlayingBoard.get(positionToLeft);
-                                    /* Если есть место */
-                                    if (!stepToLeftSquare.isPiece()) {
-                                        allowedSteps.add(positionToLeft + "");
-                                    } else {
-                                        /* Нету места */
-                                    }
-                                } else {
-                                    /* Такой позиции не существет */
-                                }
-                            }
-                        }
-                    } else {
-                        allowedSteps.add(positionToLeft + "");
-                    }
+                    getStepLeftByPosition(positionToLeft, onlyBlackSquaresPlayingBoard);
                 }
 
                 if (onlyBlackSquaresPlayingBoard.containsKey(positionToRight)) {
-                    stepToRightSquare = onlyBlackSquaresPlayingBoard.get(positionToRight);
-                    if (stepToRightSquare.isPiece()) {
-                                                            /* Если мы BLUE */
-                        if (this.getColor().equals(Constants.BLUE)) {
-                            /* Черт, это наш же */
-                            if (stepToRightSquare.getColor().equals(Constants.BLUE)) {
-                                /* Ложная тревога */
-                            } else {
-                                /* Попался */
-                                /* Надо проверить: если ли куда ходит
-                                * меняем точку перехода*/
-                                positionToRight = (this.position.getI() + 2) * 10 + this.position.getJ() + 2;
-                                /* Проверяем валидность точки */
-                                if (onlyBlackSquaresPlayingBoard.containsKey(positionToRight)) {
-                                    /* Получаем значение данной клетки */
-                                    stepToLeftSquare = onlyBlackSquaresPlayingBoard.get(positionToRight);
-                                    /* Если есть место */
-                                    if (!stepToLeftSquare.isPiece()) {
-                                        allowedSteps.add(positionToRight + "");
-                                    } else {
-                                        /* Нету места */
-                                    }
-                                } else {
-                                    /* Такой позиции не существет */
-                                }
-                            }
-                        } else {
-                            /* если не BLUE */
-                            /* Черт, это наш же */
-                            if (stepToRightSquare.getColor().equals(Constants.YELLOW)) {
-                                /* Ложная тревога */
-                            } else {
-                                /* Попался */
-                                /* Надо проверить: если ли куда ходит
-                                * меняем точку перехода*/
-                                positionToRight = (this.position.getI() - 2) * 10 + this.position.getJ() + 2;
-                                /* Проверяем валидность точки */
-                                if (onlyBlackSquaresPlayingBoard.containsKey(positionToRight)) {
-                                    /* Получаем значение данной клетки */
-                                    stepToLeftSquare = onlyBlackSquaresPlayingBoard.get(positionToRight);
-                                    /* Если есть место */
-                                    if (!stepToLeftSquare.isPiece()) {
-                                        allowedSteps.add(positionToRight + "");
-                                    } else {
-                                        /* Нету места */
-                                    }
-                                } else {
-                                    /* Такой позиции не существет */
-                                }
-                            }
-                        }
-                    } else {
-                        allowedSteps.add(positionToRight + "");
-                    }
+                    getStepRightByPosition(positionToRight, onlyBlackSquaresPlayingBoard);
                 }
             } else {
                 /* Когда по j у нас только один ход */
@@ -187,6 +67,100 @@ public class Squares {
             /* если Шашка перешла на позицию Дамки */
         }
         if (allowedSteps.size() > 0) this.allowedStep = true;
+    }
+
+    private void getStepLeftByPosition(int positionToLeft, TreeMap<Integer, Squares> onlyBlackSquaresPlayingBoard) {
+        Squares stepToLeftSquare = onlyBlackSquaresPlayingBoard.get(positionToLeft);
+        if (stepToLeftSquare.isPiece()) {
+            if (isBlue()) {
+                if (!isBlue(stepToLeftSquare)) {
+                    getLeftPosition(onlyBlackSquaresPlayingBoard);
+                }
+            } else {
+                if (!isYellow(stepToLeftSquare)) {
+                    getLeftPosition(onlyBlackSquaresPlayingBoard);
+                }
+            }
+        } else {
+            allowedSteps.add(positionToLeft + "");
+        }
+    }
+
+    private void getStepRightByPosition(int position, TreeMap<Integer, Squares> onlyBlackSquaresPlayingBoard) {
+        Squares stepToLeftSquare = onlyBlackSquaresPlayingBoard.get(position);
+        if (stepToLeftSquare.isPiece()) {
+            if (isBlue()) {
+                if (!isBlue(stepToLeftSquare)) {
+                    geRightPosition(onlyBlackSquaresPlayingBoard);
+                }
+            } else {
+                if (!isYellow(stepToLeftSquare)) {
+                    geRightPosition(onlyBlackSquaresPlayingBoard);
+                }
+            }
+        } else {
+            allowedSteps.add(position + "");
+        }
+    }
+
+    private void getLeftPosition(TreeMap<Integer, Squares> onlyBlackSquaresPlayingBoard) {
+        /* Попался */
+        /* Надо проверить: если ли куда ходит
+        * меняем точку перехода*/
+        int position = (isBlue()) ? (getI() + 2) * 10 + getJ() - 2 : (getI() - 2) * 10 + getJ() - 2;
+            /* Проверяем валидность точки */
+        if (onlyBlackSquaresPlayingBoard.containsKey(position)) {
+                /* Получаем значение данной клетки */
+            Squares stepToLeftSquare = onlyBlackSquaresPlayingBoard.get(position);
+                /* Если есть место */
+            if (!stepToLeftSquare.isPiece()) {
+                allowedSteps.add(position + "");
+            } else {
+                /* Нету места */
+            }
+        } else {
+            /* Такой позиции не существет */
+        }
+    }
+
+    private void geRightPosition(TreeMap<Integer, Squares> onlyBlackSquaresPlayingBoard) {
+        /* Попался */
+        /* Надо проверить: если ли куда ходит
+        * меняем точку перехода*/
+        int positionToRight = (isBlue()) ? (getI() + 2) * 10 + getJ() + 2 : (getI() - 2) * 10 + getJ() + 2;
+        /* Проверяем валидность точки */
+        if (onlyBlackSquaresPlayingBoard.containsKey(positionToRight)) {
+            /* Получаем значение данной клетки */
+            Squares stepToRightSquare = onlyBlackSquaresPlayingBoard.get(positionToRight);
+            /* Если есть место */
+            if (!stepToRightSquare.isPiece()) {
+                allowedSteps.add(positionToRight + "");
+            } else {
+            /* Нету места */
+            }
+        } else {
+        /* Такой позиции не существет */
+        }
+    }
+
+    private boolean isBlue() {
+        return this.getColor().equals(Constants.BLUE);
+    }
+
+    private boolean isBlue(Squares squares) {
+        return squares.getColor().equals(Constants.BLUE);
+    }
+
+    private boolean isYellow(Squares squares) {
+        return squares.getColor().equals(Constants.YELLOW);
+    }
+
+    private int getI() {
+        return this.position.getI();
+    }
+
+    private int getJ() {
+        return this.position.getJ();
     }
 
     public void makePieceDie() {
@@ -236,6 +210,7 @@ public class Squares {
     }
 
     public String toString() {
-        return position.getPosition();
+        return this.position.getPosition();
     }
+
 }

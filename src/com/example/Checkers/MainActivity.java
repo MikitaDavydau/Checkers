@@ -8,13 +8,14 @@ import android.widget.GridView;
 import android.widget.Toast;
 import com.example.Checkers.draw.entity.Squares;
 import com.example.Checkers.draw.util.CheckersArrayAdapter;
+import com.example.Checkers.draw.util.CheckersTreeMap;
 import com.example.Checkers.draw.util.Constants;
 
 import java.util.*;
 
 public class MainActivity extends Activity {
     String[][] gridTwoDimensions;
-    TreeMap<Integer, Squares> playingBoard;
+    CheckersTreeMap<Integer, Squares> playingBoard;
     TreeMap<Integer, Squares> blackSquaresPlayingBoard;
     TreeMap<Integer, Squares> bluePiecesPlayingBoard;
     TreeMap<Integer, Squares> yellowPiecesPlayingBoard;
@@ -22,8 +23,8 @@ public class MainActivity extends Activity {
     Squares fromSquares;
     Squares toSquares;
 
-    int yellowScore = 0;
-    int blueScore = 0;
+    int yellowPieces = 0;
+    int bluePieces = 0;
 
     String currentColor = Constants.YELLOW;
 
@@ -82,26 +83,40 @@ public class MainActivity extends Activity {
     private void updatePlayingInformationRewriteBoard() {
         /*Обновялем Игровой стол, чтобы его перерисовать*/
         playingBoard = adapter.swap(fromSquares, toSquares, playingBoard);
-
-        /* Обновляем Черные клетки, которыми мы пользуемся для обозначения рабочей области */
-        createOnlyBlackSquaresAndPiecesPlayingBoard();
-
-        /* Устанавливаем adapter и обновляем поле */
-        setAdapter();
-        gvMain.setAdapter(adapter);
-
-        changeCurrentColorResetFromTO();
+        if (playingBoard.isContentUpdate()) {
+            /* Обновляем Черные клетки, которыми мы пользуемся для обозначения рабочей области */
+            createOnlyBlackSquaresAndPiecesPlayingBoard();
+            /* Устанавливаем adapter и обновляем поле */
+            if (playingBoard.isScoreUpdate()) updateScore();
+            changeCurrentColorResetFromTO();
+            setAdapter();
+            gvMain.setAdapter(adapter);
+        }
     }
 
     private void createOnlyBlackSquaresAndPiecesPlayingBoard() {
-        blackSquaresPlayingBoard = new TreeMap<Integer, Squares>();
-
         for (Map.Entry<Integer, Squares> entry : playingBoard.entrySet()) {
             if (!entry.getValue().getColor().equals(Constants.LIGHT) && !entry.getValue().getColor().equals("")) {
                 blackSquaresPlayingBoard.put(entry.getKey(), entry.getValue());
             }
-
         }
+    }
+
+    /* todo: обновить playingBoard
+     * не обновляет playingBoard новыми значениями счета
+     * точнее не обновдяем вид, а сама карта обновлена */
+    private void updateScore() {
+        bluePieces = 0;
+        yellowPieces = 0;
+        for (Map.Entry<Integer, Squares> entry : blackSquaresPlayingBoard.entrySet()) {
+            if (entry.getValue().getColor().equals(Constants.BLUE)) {
+                bluePieces++;
+            } else if (entry.getValue().getColor().equals(Constants.YELLOW)) {
+                yellowPieces++;
+            }
+        }
+        playingBoard.get(93).setPosition(12 - yellowPieces + "");
+        playingBoard.get(97).setPosition(12 - bluePieces + "");
     }
 
     private void setAdapter() {
@@ -135,7 +150,7 @@ public class MainActivity extends Activity {
 
     private void createTreeMapPlayingBoard() {
         gridTwoDimensions = new String[10][10];
-        playingBoard = new TreeMap<Integer, Squares>();
+        playingBoard = new CheckersTreeMap<Integer, Squares>();
         /* Заполнение будет построчное */
         int j = 0;
         for (char a = 'a' - 1; a < 'j'; a++) {
@@ -162,11 +177,13 @@ public class MainActivity extends Activity {
                             playingBoard.put(10 * j + i, new Squares("->", Constants.SIMPLE));
                             break;
                         case 3:
-                        case 7:
-                            playingBoard.put(10 * j + i, new Squares("$", Constants.SIMPLE));
+                            playingBoard.put(10 * j + i, new Squares("0", Constants.SIMPLE));
                             break;
                         case 5:
                             playingBoard.put(10 * j + i, new Squares("Yl", Constants.SIMPLE));
+                            break;
+                        case 7:
+                            playingBoard.put(10 * j + i, new Squares("0", Constants.SIMPLE));
                             break;
                         default:
                             playingBoard.put(10 * j + i, new Squares("", Constants.SIMPLE));
