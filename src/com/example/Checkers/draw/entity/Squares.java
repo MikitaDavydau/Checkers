@@ -99,67 +99,35 @@ public class Squares {
     }
 
     private void addAllowedCrownStepsRight(TreeMap<Integer, Squares> onlyBlackSquaresPlayingBoard) {
-        int positionToLeft;
         int positionToRight;
-        /* по i мы еще не Дамка и можем ходить */
         if (getI() > 1 && getI() < 8) {
             if (getJ() > 0 && getJ() < 9) {
-                /* Добавляем к текущей позиции значение и проверием что на той клетке
-                * все равно мы тут проверяем наличие данной клетки, т.е. нам не надо
-                * узнавать в каких рамках находяться j*/
                 if (isBlue()) {
-//                    positionToLeft = (getI() + 1) * 10 + getJ() - 1;
                     positionToRight = (getI() + 1) * 10 + getJ() + 1;
                 } else {
-//                    positionToLeft = (getI() - 1) * 10 + getJ() - 1;
                     positionToRight = (getI() - 1) * 10 + getJ() + 1;
                 }
-
-//                if (onlyBlackSquaresPlayingBoard.containsKey(positionToLeft)) {
-//                    getStepLeftByPosition(positionToLeft, onlyBlackSquaresPlayingBoard);
-//                }
-
                 if (onlyBlackSquaresPlayingBoard.containsKey(positionToRight)) {
                     getStepRightByPosition(positionToRight, onlyBlackSquaresPlayingBoard);
                 }
-            } else {
-                /* Когда по j у нас только один ход */
             }
-        } else {
-            /* если Шашка перешла на позицию Дамки */
         }
         if (allowedSteps.size() > 0) this.allowedStep = true;
     }
 
     private void addAllowedCrownStepsLeft(TreeMap<Integer, Squares> onlyBlackSquaresPlayingBoard) {
         int positionToLeft;
-//        int positionToRight;
-        /* по i мы еще не Дамка и можем ходить */
         if (getI() > 1 && getI() < 8) {
             if (getJ() > 0 && getJ() < 9) {
-                /* Добавляем к текущей позиции значение и проверием что на той клетке
-                * все равно мы тут проверяем наличие данной клетки, т.е. нам не надо
-                * узнавать в каких рамках находяться j*/
                 if (isBlue()) {
                     positionToLeft = (getI() + 1) * 10 + getJ() - 1;
-//                    positionToRight = (getI() + 1) * 10 + getJ() + 1;
                 } else {
                     positionToLeft = (getI() - 1) * 10 + getJ() - 1;
-//                    positionToRight = (getI() - 1) * 10 + getJ() + 1;
                 }
-
                 if (onlyBlackSquaresPlayingBoard.containsKey(positionToLeft)) {
                     getStepLeftByPosition(positionToLeft, onlyBlackSquaresPlayingBoard);
                 }
-
-//                if (onlyBlackSquaresPlayingBoard.containsKey(positionToRight)) {
-//                    getStepRightByPosition(positionToRight, onlyBlackSquaresPlayingBoard);
-//                }
-            } else {
-                /* Когда по j у нас только один ход */
             }
-        } else {
-            /* если Шашка перешла на позицию Дамки */
         }
         if (allowedSteps.size() > 0) this.allowedStep = true;
     }
