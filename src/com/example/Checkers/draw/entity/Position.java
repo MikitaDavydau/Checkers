@@ -55,4 +55,9 @@ public class Position {
     public String toString() {
         return position;
     }
+
+    public void convertIJToString() {
+        this.ij = this.i * 10 + this.j;
+        this.position = this.ij + "";
+    }
 }

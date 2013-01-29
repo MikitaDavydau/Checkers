@@ -29,11 +29,139 @@ public class Squares {
         allowedSteps.clear();
         if (this.isPiece()) {
             if (this.isCrown()) {
-            /* если у нас Дамка - другой расчет */
+                /* 1. Найти позицию
+                 * 2. Проверить последние позиции
+                 * 3.1 Справа до конца
+                 * 3.2 Слева до конца
+                 * 4. Проверить на наличие шашек соперника
+                 * 5. Добавить ходы в список*/
+                caculateAllowedCrownSteps(onlyBlackSquaresPlayingBoard);
             } else {
                 addAllowedSteps(onlyBlackSquaresPlayingBoard);
             }
         }
+    }
+
+    private void caculateAllowedCrownSteps(TreeMap<Integer, Squares> onlyBlackSquaresPlayingBoard) {
+        /*
+        * Посчитать до сколько нам надо счаитать по краям
+        * getStepLeftByPosition
+        * getStepRightByPosition
+        */
+        addAllowedSteps(onlyBlackSquaresPlayingBoard);
+        Squares saveThisSquare = copySquare();
+        while (isIJValid()) {
+            moveOneStep(onlyBlackSquaresPlayingBoard);
+        }
+        restoreSquare(saveThisSquare);
+    }
+
+    private void moveOneStep(TreeMap<Integer, Squares> onlyBlackSquaresPlayingBoard) {
+        if (moveOneStepToRight(onlyBlackSquaresPlayingBoard)) addAllowedCrownStepsRight(onlyBlackSquaresPlayingBoard);
+
+        if (moveOneStepToLeft(onlyBlackSquaresPlayingBoard)) addAllowedCrownStepsLeft(onlyBlackSquaresPlayingBoard);
+    }
+
+    private boolean moveOneStepToLeft(TreeMap<Integer, Squares> onlyBlackSquaresPlayingBoard) {
+        boolean stepFlag = true;
+        Position currentPosition = this.getPosition();
+        if (isBlue()) {
+            currentPosition.setI(this.getI() + 1);
+            currentPosition.setJ(this.getJ() - 1);
+        } else {
+            currentPosition.setI(this.getI() - 1);
+            currentPosition.setJ(this.getJ() - 1);
+        }
+        currentPosition.convertIJToString();
+        if (onlyBlackSquaresPlayingBoard.get(currentPosition.getIJ()) != null && !onlyBlackSquaresPlayingBoard.get(currentPosition.getIJ()).isPiece()) {
+            this.setPosition(currentPosition.getPosition());
+            stepFlag = true;
+        }
+        return stepFlag;
+    }
+
+    private boolean moveOneStepToRight(TreeMap<Integer, Squares> onlyBlackSquaresPlayingBoard) {
+        boolean stepFlag = true;
+        Position currentPosition = this.getPosition();
+        if (isBlue()) {
+            currentPosition.setI(this.getI() - 1);
+            currentPosition.setJ(this.getJ() - 1);
+        } else {
+            currentPosition.setI(this.getI() - 1);
+            currentPosition.setJ(this.getJ() + 1);
+        }
+        currentPosition.convertIJToString();
+        if (!onlyBlackSquaresPlayingBoard.get(currentPosition.getIJ()).isPiece()) {
+            this.setPosition(currentPosition.getPosition());
+            stepFlag = true;
+        }
+        return stepFlag;
+    }
+
+    private void addAllowedCrownStepsRight(TreeMap<Integer, Squares> onlyBlackSquaresPlayingBoard) {
+        int positionToLeft;
+        int positionToRight;
+        /* по i мы еще не Дамка и можем ходить */
+        if (getI() > 1 && getI() < 8) {
+            if (getJ() > 0 && getJ() < 9) {
+                /* Добавляем к текущей позиции значение и проверием что на той клетке
+                * все равно мы тут проверяем наличие данной клетки, т.е. нам не надо
+                * узнавать в каких рамках находяться j*/
+                if (isBlue()) {
+//                    positionToLeft = (getI() + 1) * 10 + getJ() - 1;
+                    positionToRight = (getI() + 1) * 10 + getJ() + 1;
+                } else {
+//                    positionToLeft = (getI() - 1) * 10 + getJ() - 1;
+                    positionToRight = (getI() - 1) * 10 + getJ() + 1;
+                }
+
+//                if (onlyBlackSquaresPlayingBoard.containsKey(positionToLeft)) {
+//                    getStepLeftByPosition(positionToLeft, onlyBlackSquaresPlayingBoard);
+//                }
+
+                if (onlyBlackSquaresPlayingBoard.containsKey(positionToRight)) {
+                    getStepRightByPosition(positionToRight, onlyBlackSquaresPlayingBoard);
+                }
+            } else {
+                /* Когда по j у нас только один ход */
+            }
+        } else {
+            /* если Шашка перешла на позицию Дамки */
+        }
+        if (allowedSteps.size() > 0) this.allowedStep = true;
+    }
+
+    private void addAllowedCrownStepsLeft(TreeMap<Integer, Squares> onlyBlackSquaresPlayingBoard) {
+        int positionToLeft;
+//        int positionToRight;
+        /* по i мы еще не Дамка и можем ходить */
+        if (getI() > 1 && getI() < 8) {
+            if (getJ() > 0 && getJ() < 9) {
+                /* Добавляем к текущей позиции значение и проверием что на той клетке
+                * все равно мы тут проверяем наличие данной клетки, т.е. нам не надо
+                * узнавать в каких рамках находяться j*/
+                if (isBlue()) {
+                    positionToLeft = (getI() + 1) * 10 + getJ() - 1;
+//                    positionToRight = (getI() + 1) * 10 + getJ() + 1;
+                } else {
+                    positionToLeft = (getI() - 1) * 10 + getJ() - 1;
+//                    positionToRight = (getI() - 1) * 10 + getJ() + 1;
+                }
+
+                if (onlyBlackSquaresPlayingBoard.containsKey(positionToLeft)) {
+                    getStepLeftByPosition(positionToLeft, onlyBlackSquaresPlayingBoard);
+                }
+
+//                if (onlyBlackSquaresPlayingBoard.containsKey(positionToRight)) {
+//                    getStepRightByPosition(positionToRight, onlyBlackSquaresPlayingBoard);
+//                }
+            } else {
+                /* Когда по j у нас только один ход */
+            }
+        } else {
+            /* если Шашка перешла на позицию Дамки */
+        }
+        if (allowedSteps.size() > 0) this.allowedStep = true;
     }
 
     private void addAllowedSteps(TreeMap<Integer, Squares> onlyBlackSquaresPlayingBoard) {
@@ -143,6 +271,18 @@ public class Squares {
         }
     }
 
+    private Squares copySquare() {
+        Squares squares = new Squares(this.getPosition().getPosition(), this.getColor());
+        squares.setCrown(this.isCrown());
+        squares.setPiece(this.isPiece());
+        squares.allowedSteps = this.getAllowedSteps();
+        return squares;
+    }
+
+    private void restoreSquare(Squares squares) {
+        this.position = squares.position;
+    }
+
     private boolean isBlue() {
         return this.getColor().equals(Constants.BLUE);
     }
@@ -153,6 +293,10 @@ public class Squares {
 
     private boolean isYellow(Squares squares) {
         return squares.getColor().equals(Constants.YELLOW);
+    }
+
+    private boolean isIJValid() {
+        return (getI() > 0 && getI() < 9 && getJ() > 0 && getJ() < 9);
     }
 
     private int getI() {

@@ -76,6 +76,7 @@ public class MainActivity extends Activity {
             }
         });
 
+        blackSquaresPlayingBoard.get(61).setCrown(true);
         gvMain.setAdapter(adapter);
         adjustGridView();
     }
