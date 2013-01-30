@@ -37,8 +37,11 @@ public class Squares {
     }
 
     private void calculateAllowedCrownSteps(TreeMap<Integer, Squares> onlyBlackSquaresPlayingBoard) {
-        addAllowedSteps(onlyBlackSquaresPlayingBoard);
+
         Squares saveThisSquare = copySquare();
+
+        /* Сначала считаем для реального цвета */
+        addAllowedSteps(onlyBlackSquaresPlayingBoard);
 
         while (isIJValid()) {
             if (moveOneStepToLeft(onlyBlackSquaresPlayingBoard))
@@ -50,6 +53,28 @@ public class Squares {
             if (moveOneStepToRight(onlyBlackSquaresPlayingBoard))
                 addAllowedCrownStepsRight(onlyBlackSquaresPlayingBoard);
         }
+        restoreSquare(saveThisSquare);
+        /* Конец реального цвета*/
+
+        /* Меняем цвет на противоположный и считаем */
+        changeColor();
+        addAllowedSteps(onlyBlackSquaresPlayingBoard);
+
+        while (isIJValid()) {
+            if (moveOneStepToLeft(onlyBlackSquaresPlayingBoard))
+                addAllowedCrownStepsLeft(onlyBlackSquaresPlayingBoard);
+        }
+        restoreSquare(saveThisSquare);
+
+        while (isIJValid()) {
+            if (moveOneStepToRight(onlyBlackSquaresPlayingBoard))
+                addAllowedCrownStepsRight(onlyBlackSquaresPlayingBoard);
+        }
+        /* Конец противоположного цвета*/
+
+        /* Возвращаем цвет */
+        changeColor();
+        /* Возвращаем значение */
         restoreSquare(saveThisSquare);
     }
 
@@ -236,6 +261,10 @@ public class Squares {
         squares.setPiece(this.isPiece());
         squares.allowedSteps = this.getAllowedSteps();
         return squares;
+    }
+
+    private void changeColor() {
+        this.color = (isBlue()) ? Constants.YELLOW : Constants.BLUE;
     }
 
     private void restoreSquare(Squares squares) {

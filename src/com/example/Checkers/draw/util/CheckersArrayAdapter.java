@@ -17,15 +17,15 @@ public class CheckersArrayAdapter<T> extends ArrayAdapter<Squares> {
 
     private Context context;
     private List<Squares> playingBoard;
-    private int resource;
-    private int textViewResourceId;
+//    private int resource;
+//    private int textViewResourceId;
 
     public CheckersArrayAdapter(Context context, int resource, int textViewResourceId, List<Squares> objects) {
         super(context, resource, textViewResourceId, objects);
         this.context = context;
         this.playingBoard = objects;
-        this.resource = resource;
-        this.textViewResourceId = textViewResourceId;
+//        this.resource = resource;
+//        this.textViewResourceId = textViewResourceId;
     }
 
 
@@ -55,22 +55,39 @@ public class CheckersArrayAdapter<T> extends ArrayAdapter<Squares> {
                         *
                         * Math.abs(from - to) > 12 - используяется для того, чтомы точно понять, что мы перескакиваем,
                         * а не делаем просто ход. Ход (from - to): 9 либо 11*/
-                        if (Math.abs(from - to) > 12) {
-                            int position;
-                            if (toSquare.getColor().equals(Constants.BLUE)) {
-                                position = from + ((from - to) / 2);
-                            } else {
-                                position = from - ((from - to) / 2);
+                        int position;
+                        if (!fromSquare.isCrown()) {
+                            if (Math.abs(from - to) > 12) {
+                                if (toSquare.getColor().equals(Constants.BLUE)) {
+                                    position = from + ((from - to) / 2);
+                                } else {
+                                    position = from - ((from - to) / 2);
+                                }
+                                playingBoard.setScoreUpdate(true);
+                                playingBoard.get(position).makePieceDie();
                             }
-                            playingBoard.setScoreUpdate(true);
-                            playingBoard.get(position).makePieceDie();
+                        } else {
+                            if (Math.abs(from - to) > 12) {
+                                /* Надо определить кратность движения
+                                 * 1. Проверить на что делиться нацело
+                                 * 2. Умножить и получить испокое значение*/
+                                int positionRatio;
+                                /* Если движемся вверх */
+                                if ((from - to) % 9 == 0) {
+                                    positionRatio = (from - to) / 9;
+                                    position = from - (9 * (Math.abs(positionRatio) - 1));
+                                } else {
+                                /*Если вниз */
+                                    positionRatio = (from - to) / 11;
+                                    position = from + (11 * (Math.abs(positionRatio) - 1));
+                                }
+
+                                playingBoard.setScoreUpdate(true);
+                                playingBoard.get(position).makePieceDie();
+                            }
                         }
 
-                        if (fromSquare.getColor().equals(Constants.BLUE) && fromSquare.getPosition().getI() == 8)
-                            fromSquare.setCrown(true);
-
-                        if (fromSquare.getColor().equals(Constants.YELLOW) && fromSquare.getPosition().getI() == 1)
-                            fromSquare.setCrown(true);
+                        fromSquare = (isCorner(to)) ? makeCrown(fromSquare) : fromSquare;
 
                         playingBoard.put(from, toSquare);
                         playingBoard.put(to, fromSquare);
@@ -79,14 +96,29 @@ public class CheckersArrayAdapter<T> extends ArrayAdapter<Squares> {
                     }
                 }
             } else {
-                makeToast("I haven't allowed steps");
+                if (playingBoard.isMakeToast()) makeToast("I haven't allowed steps");
             }
         } else {
-            makeToast("This coordinates is not contains");
+            if (playingBoard.isMakeToast()) makeToast("This coordinates is not contains");
         }
         playingBoard.setContentUpdate(stepFlag);
-        if (!stepFlag) makeToast("This is not allowed step");
+        if (!stepFlag && playingBoard.isMakeToast()) makeToast("This is not allowed step");
+
         return playingBoard;
+    }
+
+    private boolean isCorner(int to) {
+        return to == 8 || to == 1;
+    }
+
+    private Squares makeCrown(Squares fromSquare) {
+        if (fromSquare.getColor().equals(Constants.BLUE) && fromSquare.getPosition().getI() == 8)
+            fromSquare.setCrown(true);
+
+        if (fromSquare.getColor().equals(Constants.YELLOW) && fromSquare.getPosition().getI() == 1)
+            fromSquare.setCrown(true);
+
+        return fromSquare;
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {

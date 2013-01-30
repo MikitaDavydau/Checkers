@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">Checkers</string>
     <string name="piece">Piece</string>
+    <string name="hintOnOff">Hint</string>
 </resources>

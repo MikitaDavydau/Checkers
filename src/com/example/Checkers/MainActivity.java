@@ -2,6 +2,9 @@ package com.example.Checkers;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
@@ -63,7 +66,8 @@ public class MainActivity extends Activity {
                 }
                 fromSquares = (square.isPiece() && square.getColor().equals(currentColor)) ? square : null;
 
-                makeToast("Item: " + adapterView.getItemAtPosition(i) + createPositionToast(square));
+                if (playingBoard.isMakeToast())
+                    makeToast("Item: " + adapterView.getItemAtPosition(i) + createPositionToast(square));
             }
         });
 
@@ -103,8 +107,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    /* todo: обновить playingBoard
-     * не обновляет playingBoard новыми значениями счета
+    /* не обновляет playingBoard новыми значениями счета
      * точнее не обновдяем вид, а сама карта обновлена */
     private void updateScore() {
         bluePieces = 0;
@@ -252,6 +255,27 @@ public class MainActivity extends Activity {
         for (Map.Entry<Integer, Squares> entry : blackSquaresPlayingBoard.entrySet()) {
             entry.getValue().calculateAllowedSteps(blackSquaresPlayingBoard);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.hintOnOff:
+                setPlayingBoardHintOnOff();
+                return true;
+        }
+        return false;
+    }
+
+    private void setPlayingBoardHintOnOff() {
+        playingBoard.setMakeToast(!playingBoard.isMakeToast());
     }
 
     private void makeToast(String text) {
