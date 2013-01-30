@@ -29,37 +29,28 @@ public class Squares {
         allowedSteps.clear();
         if (this.isPiece()) {
             if (this.isCrown()) {
-                /* 1. Найти позицию
-                 * 2. Проверить последние позиции
-                 * 3.1 Справа до конца
-                 * 3.2 Слева до конца
-                 * 4. Проверить на наличие шашек соперника
-                 * 5. Добавить ходы в список*/
-                caculateAllowedCrownSteps(onlyBlackSquaresPlayingBoard);
+                calculateAllowedCrownSteps(onlyBlackSquaresPlayingBoard);
             } else {
                 addAllowedSteps(onlyBlackSquaresPlayingBoard);
             }
         }
     }
 
-    private void caculateAllowedCrownSteps(TreeMap<Integer, Squares> onlyBlackSquaresPlayingBoard) {
-        /*
-        * Посчитать до сколько нам надо счаитать по краям
-        * getStepLeftByPosition
-        * getStepRightByPosition
-        */
+    private void calculateAllowedCrownSteps(TreeMap<Integer, Squares> onlyBlackSquaresPlayingBoard) {
         addAllowedSteps(onlyBlackSquaresPlayingBoard);
         Squares saveThisSquare = copySquare();
+
         while (isIJValid()) {
-            moveOneStep(onlyBlackSquaresPlayingBoard);
+            if (moveOneStepToLeft(onlyBlackSquaresPlayingBoard))
+                addAllowedCrownStepsLeft(onlyBlackSquaresPlayingBoard);
         }
         restoreSquare(saveThisSquare);
-    }
 
-    private void moveOneStep(TreeMap<Integer, Squares> onlyBlackSquaresPlayingBoard) {
-        if (moveOneStepToRight(onlyBlackSquaresPlayingBoard)) addAllowedCrownStepsRight(onlyBlackSquaresPlayingBoard);
-
-        if (moveOneStepToLeft(onlyBlackSquaresPlayingBoard)) addAllowedCrownStepsLeft(onlyBlackSquaresPlayingBoard);
+        while (isIJValid()) {
+            if (moveOneStepToRight(onlyBlackSquaresPlayingBoard))
+                addAllowedCrownStepsRight(onlyBlackSquaresPlayingBoard);
+        }
+        restoreSquare(saveThisSquare);
     }
 
     private boolean moveOneStepToLeft(TreeMap<Integer, Squares> onlyBlackSquaresPlayingBoard) {
@@ -91,7 +82,7 @@ public class Squares {
             currentPosition.setJ(this.getJ() + 1);
         }
         currentPosition.convertIJToString();
-        if (!onlyBlackSquaresPlayingBoard.get(currentPosition.getIJ()).isPiece()) {
+        if (onlyBlackSquaresPlayingBoard.get(currentPosition.getIJ()) != null && !onlyBlackSquaresPlayingBoard.get(currentPosition.getIJ()).isPiece()) {
             this.setPosition(currentPosition.getPosition());
             stepFlag = true;
         }
@@ -136,7 +127,7 @@ public class Squares {
         int positionToLeft;
         int positionToRight;
         /* по i мы еще не Дамка и можем ходить */
-        if (getI() > 1 && getI() < 8) {
+        if (getI() > 0 && getI() < 9) {
             if (getJ() > 0 && getJ() < 9) {
                 /* Добавляем к текущей позиции значение и проверием что на той клетке
                 * все равно мы тут проверяем наличие данной клетки, т.е. нам не надо
@@ -248,7 +239,7 @@ public class Squares {
     }
 
     private void restoreSquare(Squares squares) {
-        this.position = squares.position;
+        this.setPosition(squares.getPosition().getPosition());
     }
 
     private boolean isBlue() {

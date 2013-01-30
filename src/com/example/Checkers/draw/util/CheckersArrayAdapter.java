@@ -1,6 +1,7 @@
 package com.example.Checkers.draw.util;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,9 +42,6 @@ public class CheckersArrayAdapter<T> extends ArrayAdapter<Squares> {
                         toSquare.setPosition(String.valueOf(from));
                         fromSquare.setPosition(String.valueOf(to));
 
-                        playingBoard.put(from, toSquare);
-                        playingBoard.put(to, fromSquare);
-
                         /* Хитрый способ получения значения клетки, которая находиться между 2мя
                         * т.е. допустим мы ходим: 54-36, перескакивая через Шашку
                         * система расчета для Желтых такая (все значения берутся абсолютно!):
@@ -67,6 +65,16 @@ public class CheckersArrayAdapter<T> extends ArrayAdapter<Squares> {
                             playingBoard.setScoreUpdate(true);
                             playingBoard.get(position).makePieceDie();
                         }
+
+                        if (fromSquare.getColor().equals(Constants.BLUE) && fromSquare.getPosition().getI() == 8)
+                            fromSquare.setCrown(true);
+
+                        if (fromSquare.getColor().equals(Constants.YELLOW) && fromSquare.getPosition().getI() == 1)
+                            fromSquare.setCrown(true);
+
+                        playingBoard.put(from, toSquare);
+                        playingBoard.put(to, fromSquare);
+
                         stepFlag = true;
                     }
                 }
@@ -84,17 +92,35 @@ public class CheckersArrayAdapter<T> extends ArrayAdapter<Squares> {
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.item_black, parent, false);
+
         TextView textView = (TextView) rowView.findViewById(R.id.tvText);
         textView.setText(playingBoard.get(position).getPosition().getPosition());
 
-//        ImageView imageView = (ImageView) rowView.findViewById(R.id.squareImage);
-//        imageView.setImageResource(R.drawable.piece_black);
-
         String s = playingBoard.get(position).getColor();
-        if (s.startsWith(Constants.LIGHT)) rowView = inflater.inflate(R.layout.item_light, parent, false);
-        else if (s.startsWith(Constants.BLUE)) rowView = inflater.inflate(R.layout.item_blue, parent, false);
-        else if (s.startsWith(Constants.YELLOW)) rowView = inflater.inflate(R.layout.item_yellow, parent, false);
+        Boolean isCrown = playingBoard.get(position).isCrown();
+        if (s.startsWith(Constants.LIGHT)) {
+            rowView = inflater.inflate(R.layout.item_light, parent, false);
+            if (isCrown) {
+                rowView = setCrownText(rowView);
+            }
+        } else if (s.startsWith(Constants.BLUE)) {
+            rowView = inflater.inflate(R.layout.item_blue, parent, false);
+            if (isCrown) {
+                rowView = setCrownText(rowView);
+            }
+        } else if (s.startsWith(Constants.YELLOW)) {
+            rowView = inflater.inflate(R.layout.item_yellow, parent, false);
+            if (isCrown) {
+                rowView = setCrownText(rowView);
+            }
+        }
+        return rowView;
+    }
 
+    private View setCrownText(View rowView) {
+        TextView textView = (TextView) rowView.findViewById(R.id.tvText);
+        textView.setTextColor(Color.BLACK);
+        textView.setText("Cr");
         return rowView;
     }
 

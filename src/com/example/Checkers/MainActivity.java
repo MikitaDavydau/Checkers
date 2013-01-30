@@ -89,7 +89,7 @@ public class MainActivity extends Activity {
             createOnlyBlackSquaresAndPiecesPlayingBoard();
             /* Устанавливаем adapter и обновляем поле */
             if (playingBoard.isScoreUpdate()) updateScore();
-            changeCurrentColorResetFromTO();
+            changeCurrentColorResetFromTo();
             setAdapter();
             gvMain.setAdapter(adapter);
         }
@@ -124,7 +124,7 @@ public class MainActivity extends Activity {
         adapter = new CheckersArrayAdapter<String>(this, R.layout.item_black, R.id.tvText, new ArrayList<Squares>(playingBoard.values()));
     }
 
-    private void changeCurrentColorResetFromTO() {
+    private void changeCurrentColorResetFromTo() {
         currentColor = (currentColor.equals(Constants.BLUE)) ? Constants.YELLOW : Constants.BLUE;
         toSquares = null;
         fromSquares = null;

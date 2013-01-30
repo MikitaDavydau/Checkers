@@ -20,14 +20,4 @@
         android:text=""
         android:layout_gravity="center">
     </TextView>
-
-    <!--<ImageView-->
-    <!--android:id="@+id/squareImage"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:gravity="center_vertical"-->
-    <!--android:minHeight="40dp"-->
-    <!--android:contentDescription="@string/piece"-->
-    <!--android:layout_gravity="center"/>-->
-
 </LinearLayout>
