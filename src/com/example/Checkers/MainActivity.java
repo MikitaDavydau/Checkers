@@ -17,7 +17,6 @@ import com.example.Checkers.draw.util.Constants;
 import java.util.*;
 
 public class MainActivity extends Activity {
-    String[][] gridTwoDimensions;
     CheckersTreeMap<Integer, Squares> playingBoard;
     TreeMap<Integer, Squares> blackSquaresPlayingBoard;
     TreeMap<Integer, Squares> bluePiecesPlayingBoard;
@@ -48,8 +47,6 @@ public class MainActivity extends Activity {
         createOnlyBluePiecesPlayingBoard();
         createOnlyYellowPiecesPlayingBoard();
 
-        updateAllAllowedSteps();
-
         setAdapter();
 
         gvMain = (GridView) findViewById(R.id.gvMain);
@@ -71,16 +68,6 @@ public class MainActivity extends Activity {
             }
         });
 
-        gvMain.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Squares square = (Squares) adapterView.getItemAtPosition(i);
-                //todo: create drag&drop action
-                return true;
-            }
-        });
-
-        blackSquaresPlayingBoard.get(61).setCrown(true);
         gvMain.setAdapter(adapter);
         adjustGridView();
     }
@@ -149,13 +136,11 @@ public class MainActivity extends Activity {
 
     private void adjustGridView() {
         gvMain.setNumColumns(10);
-//        gvMain.setColumnWidth(50);
         gvMain.setVerticalSpacing(5);
         gvMain.setHorizontalSpacing(5);
     }
 
     private void createTreeMapPlayingBoard() {
-        gridTwoDimensions = new String[10][10];
         playingBoard = new CheckersTreeMap<Integer, Squares>();
         /* Заполнение будет построчное */
         int j = 0;
@@ -163,13 +148,11 @@ public class MainActivity extends Activity {
             for (int i = 0; i < 10; i++) {
                 if (j == 0) {
                     if (i == 0) {
-                        gridTwoDimensions[j][i] = "";
                         playingBoard.put(10 * j + i, new Squares("", ""));
                     } else if (i == 9) {
                         /* colorate right|left corner*/
                         playingBoard.put(10 * j + i, new Squares("", Constants.SIMPLE));
                     } else {
-                        gridTwoDimensions[j][i] = "" + i;
                         playingBoard.put(10 * j + i, new Squares("" + i, ""));
                     }
                 } else if (j == 9) {
@@ -197,13 +180,11 @@ public class MainActivity extends Activity {
                     }
                 } else {
                     if (i == 0) {
-                        gridTwoDimensions[j][i] = a + "";
                         playingBoard.put(10 * j + i, new Squares(a + "", ""));
                     } else if (i == 9) {
                         /* colorate down */
                         playingBoard.put(10 * j + i, new Squares("", Constants.SIMPLE));
                     } else {
-                        gridTwoDimensions[j][i] = a + "" + i;
                         if ((i % 2 != 0 && j % 2 == 0) || (i % 2 == 0 && j % 2 != 0)) {
                             playingBoard.put(10 * j + i, new Squares(j + "" + i, Constants.BLACK));
                         } else {

@@ -17,15 +17,11 @@ public class CheckersArrayAdapter<T> extends ArrayAdapter<Squares> {
 
     private Context context;
     private List<Squares> playingBoard;
-//    private int resource;
-//    private int textViewResourceId;
 
     public CheckersArrayAdapter(Context context, int resource, int textViewResourceId, List<Squares> objects) {
         super(context, resource, textViewResourceId, objects);
         this.context = context;
         this.playingBoard = objects;
-//        this.resource = resource;
-//        this.textViewResourceId = textViewResourceId;
     }
 
 
@@ -130,6 +126,7 @@ public class CheckersArrayAdapter<T> extends ArrayAdapter<Squares> {
 
         String s = playingBoard.get(position).getColor();
         Boolean isCrown = playingBoard.get(position).isCrown();
+
         if (s.startsWith(Constants.LIGHT)) {
             rowView = inflater.inflate(R.layout.item_light, parent, false);
         } else if (s.startsWith(Constants.BLUE)) {
@@ -144,6 +141,7 @@ public class CheckersArrayAdapter<T> extends ArrayAdapter<Squares> {
             }
         } else if (s.startsWith(Constants.SIMPLE)) {
             rowView = inflater.inflate(R.layout.item_simple, parent, false);
+            rowView = setBoarderText(rowView, position);
         }
         return rowView;
     }
@@ -152,6 +150,12 @@ public class CheckersArrayAdapter<T> extends ArrayAdapter<Squares> {
         TextView textView = (TextView) rowView.findViewById(R.id.tvText);
         textView.setTextColor(Color.BLACK);
         textView.setText("Cr");
+        return rowView;
+    }
+
+    private View setBoarderText(View rowView, int position) {
+        TextView textView = (TextView) rowView.findViewById(R.id.tvText);
+        textView.setText(playingBoard.get(position).getPosition().getPosition());
         return rowView;
     }
 
