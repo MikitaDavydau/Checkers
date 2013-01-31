@@ -28,6 +28,26 @@ public class Position {
         return getPosition();
     }
 
+    public boolean isIOnTheBoard() {
+        return this.i > 1 && this.i < 8;
+    }
+
+    public boolean isJOnTheBoard() {
+        return this.j > 0 && this.j < 9;
+    }
+
+    public boolean isIValid() {
+        return this.i > 0 && this.i < 9;
+    }
+
+    public boolean isJValid() {
+        return this.j > 0 && this.j < 9;
+    }
+
+    public boolean isIJValid() {
+        return (isIValid() && isJValid());
+    }
+
     public int getI() {
         return i;
     }
@@ -59,5 +79,41 @@ public class Position {
     public void convertIJToString() {
         this.ij = this.i * 10 + this.j;
         this.position = this.ij + "";
+    }
+
+    public int setBluePositionLeft() {
+        return (this.i + 1) * 10 + this.j - 1;
+    }
+
+    public int setBluePositionRight() {
+        return (this.i + 1) * 10 + this.j + 1;
+    }
+
+    public int setYellowPositionLeft() {
+        return (this.i - 1) * 10 + this.j - 1;
+    }
+
+    public int setYellowPositionRight() {
+        return (this.i - 1) * 10 + this.j + 1;
+    }
+
+    public void setBlueMoveLeft() {
+        this.i += 1;
+        this.j -= 1;
+    }
+
+    public void setBlueMoveRight() {
+        this.i += 1;
+        this.j += 1;
+    }
+
+    public void setYellowMoveLeft() {
+        this.i -= 1;
+        this.j -= 1;
+    }
+
+    public void setYellowMoveRight() {
+        this.i -= 1;
+        this.j += 1;
     }
 }

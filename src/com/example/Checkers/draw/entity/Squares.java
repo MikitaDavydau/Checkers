@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.TreeMap;
 
 public class Squares {
+    private final int SIDES = 4;
+
     private Position position;
 
     private String color;
@@ -37,56 +39,33 @@ public class Squares {
     }
 
     private void calculateAllowedCrownSteps(TreeMap<Integer, Squares> onlyBlackSquaresPlayingBoard) {
-
         Squares saveThisSquare = copySquare();
 
-        /* Сначала считаем для реального цвета */
-        addAllowedSteps(onlyBlackSquaresPlayingBoard);
-
-        while (isIJValid()) {
-            if (moveOneStepToLeft(onlyBlackSquaresPlayingBoard))
-                addAllowedCrownStepsLeft(onlyBlackSquaresPlayingBoard);
+        for (int i = 0; i < SIDES; i++) {
+            if (i < 2) {
+                addAllowedSteps(onlyBlackSquaresPlayingBoard);
+                while (getPosition().isIJValid()) {
+                    if (moveOneStepToLeft(onlyBlackSquaresPlayingBoard))
+                        addAllowedCrownStepsLeft(onlyBlackSquaresPlayingBoard);
+                }
+            } else {
+                while (getPosition().isIJValid()) {
+                    if (moveOneStepToRight(onlyBlackSquaresPlayingBoard))
+                        addAllowedCrownStepsRight(onlyBlackSquaresPlayingBoard);
+                }
+            }
+            restoreSquare(saveThisSquare);
+            changeColor();
         }
-        restoreSquare(saveThisSquare);
-
-        while (isIJValid()) {
-            if (moveOneStepToRight(onlyBlackSquaresPlayingBoard))
-                addAllowedCrownStepsRight(onlyBlackSquaresPlayingBoard);
-        }
-        restoreSquare(saveThisSquare);
-        /* Конец реального цвета*/
-
-        /* Меняем цвет на противоположный и считаем */
-        changeColor();
-        addAllowedSteps(onlyBlackSquaresPlayingBoard);
-
-        while (isIJValid()) {
-            if (moveOneStepToLeft(onlyBlackSquaresPlayingBoard))
-                addAllowedCrownStepsLeft(onlyBlackSquaresPlayingBoard);
-        }
-        restoreSquare(saveThisSquare);
-
-        while (isIJValid()) {
-            if (moveOneStepToRight(onlyBlackSquaresPlayingBoard))
-                addAllowedCrownStepsRight(onlyBlackSquaresPlayingBoard);
-        }
-        /* Конец противоположного цвета*/
-
-        /* Возвращаем цвет */
-        changeColor();
-        /* Возвращаем значение */
-        restoreSquare(saveThisSquare);
     }
 
     private boolean moveOneStepToLeft(TreeMap<Integer, Squares> onlyBlackSquaresPlayingBoard) {
         boolean stepFlag = true;
         Position currentPosition = this.getPosition();
         if (isBlue()) {
-            currentPosition.setI(this.getI() + 1);
-            currentPosition.setJ(this.getJ() - 1);
+            currentPosition.setBlueMoveLeft();
         } else {
-            currentPosition.setI(this.getI() - 1);
-            currentPosition.setJ(this.getJ() - 1);
+            currentPosition.setYellowMoveLeft();
         }
         currentPosition.convertIJToString();
         if (onlyBlackSquaresPlayingBoard.get(currentPosition.getIJ()) != null && !onlyBlackSquaresPlayingBoard.get(currentPosition.getIJ()).isPiece()) {
@@ -100,11 +79,9 @@ public class Squares {
         boolean stepFlag = true;
         Position currentPosition = this.getPosition();
         if (isBlue()) {
-            currentPosition.setI(this.getI() - 1);
-            currentPosition.setJ(this.getJ() - 1);
+            currentPosition.setBlueMoveRight();
         } else {
-            currentPosition.setI(this.getI() - 1);
-            currentPosition.setJ(this.getJ() + 1);
+            currentPosition.setYellowMoveRight();
         }
         currentPosition.convertIJToString();
         if (onlyBlackSquaresPlayingBoard.get(currentPosition.getIJ()) != null && !onlyBlackSquaresPlayingBoard.get(currentPosition.getIJ()).isPiece()) {
@@ -116,12 +93,12 @@ public class Squares {
 
     private void addAllowedCrownStepsRight(TreeMap<Integer, Squares> onlyBlackSquaresPlayingBoard) {
         int positionToRight;
-        if (getI() > 1 && getI() < 8) {
-            if (getJ() > 0 && getJ() < 9) {
+        if (getPosition().isIOnTheBoard()) {
+            if (getPosition().isJOnTheBoard()) {
                 if (isBlue()) {
-                    positionToRight = (getI() + 1) * 10 + getJ() + 1;
+                    positionToRight = getPosition().setBluePositionRight();
                 } else {
-                    positionToRight = (getI() - 1) * 10 + getJ() + 1;
+                    positionToRight = getPosition().setYellowPositionRight();
                 }
                 if (onlyBlackSquaresPlayingBoard.containsKey(positionToRight)) {
                     getStepRightByPosition(positionToRight, onlyBlackSquaresPlayingBoard);
@@ -133,12 +110,12 @@ public class Squares {
 
     private void addAllowedCrownStepsLeft(TreeMap<Integer, Squares> onlyBlackSquaresPlayingBoard) {
         int positionToLeft;
-        if (getI() > 1 && getI() < 8) {
-            if (getJ() > 0 && getJ() < 9) {
+        if (getPosition().isIOnTheBoard()) {
+            if (getPosition().isJOnTheBoard()) {
                 if (isBlue()) {
-                    positionToLeft = (getI() + 1) * 10 + getJ() - 1;
+                    positionToLeft = getPosition().setBluePositionLeft();
                 } else {
-                    positionToLeft = (getI() - 1) * 10 + getJ() - 1;
+                    positionToLeft = getPosition().setYellowPositionLeft();
                 }
                 if (onlyBlackSquaresPlayingBoard.containsKey(positionToLeft)) {
                     getStepLeftByPosition(positionToLeft, onlyBlackSquaresPlayingBoard);
@@ -152,17 +129,17 @@ public class Squares {
         int positionToLeft;
         int positionToRight;
         /* по i мы еще не Дамка и можем ходить */
-        if (getI() > 0 && getI() < 9) {
-            if (getJ() > 0 && getJ() < 9) {
+        if (getPosition().isIValid()) {
+            if (getPosition().isJValid()) {
                 /* Добавляем к текущей позиции значение и проверием что на той клетке
                 * все равно мы тут проверяем наличие данной клетки, т.е. нам не надо
                 * узнавать в каких рамках находяться j*/
                 if (isBlue()) {
-                    positionToLeft = (getI() + 1) * 10 + getJ() - 1;
-                    positionToRight = (getI() + 1) * 10 + getJ() + 1;
+                    positionToLeft = getPosition().setBluePositionLeft();
+                    positionToRight = getPosition().setBluePositionRight();
                 } else {
-                    positionToLeft = (getI() - 1) * 10 + getJ() - 1;
-                    positionToRight = (getI() - 1) * 10 + getJ() + 1;
+                    positionToLeft = getPosition().setYellowPositionLeft();
+                    positionToRight = getPosition().setYellowPositionRight();
                 }
 
                 if (onlyBlackSquaresPlayingBoard.containsKey(positionToLeft)) {
@@ -199,14 +176,14 @@ public class Squares {
     }
 
     private void getStepRightByPosition(int position, TreeMap<Integer, Squares> onlyBlackSquaresPlayingBoard) {
-        Squares stepToLeftSquare = onlyBlackSquaresPlayingBoard.get(position);
-        if (stepToLeftSquare.isPiece()) {
+        Squares stepToRightSquare = onlyBlackSquaresPlayingBoard.get(position);
+        if (stepToRightSquare.isPiece()) {
             if (isBlue()) {
-                if (!isBlue(stepToLeftSquare)) {
+                if (!isBlue(stepToRightSquare)) {
                     geRightPosition(onlyBlackSquaresPlayingBoard);
                 }
             } else {
-                if (!isYellow(stepToLeftSquare)) {
+                if (!isYellow(stepToRightSquare)) {
                     geRightPosition(onlyBlackSquaresPlayingBoard);
                 }
             }
@@ -281,10 +258,6 @@ public class Squares {
 
     private boolean isYellow(Squares squares) {
         return squares.getColor().equals(Constants.YELLOW);
-    }
-
-    private boolean isIJValid() {
-        return (getI() > 0 && getI() < 9 && getJ() > 0 && getJ() < 9);
     }
 
     private int getI() {

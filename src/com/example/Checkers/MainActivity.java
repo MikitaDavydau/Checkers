@@ -101,7 +101,9 @@ public class MainActivity extends Activity {
 
     private void createOnlyBlackSquaresAndPiecesPlayingBoard() {
         for (Map.Entry<Integer, Squares> entry : playingBoard.entrySet()) {
-            if (!entry.getValue().getColor().equals(Constants.LIGHT) && !entry.getValue().getColor().equals("")) {
+            if (entry.getValue().getColor().equals(Constants.BLACK) ||
+                    entry.getValue().getColor().equals(Constants.BLUE) ||
+                    entry.getValue().getColor().equals(Constants.YELLOW)) {
                 blackSquaresPlayingBoard.put(entry.getKey(), entry.getValue());
             }
         }

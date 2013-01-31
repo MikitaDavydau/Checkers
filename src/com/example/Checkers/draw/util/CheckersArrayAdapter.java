@@ -87,7 +87,7 @@ public class CheckersArrayAdapter<T> extends ArrayAdapter<Squares> {
                             }
                         }
 
-                        fromSquare = (isCorner(to)) ? makeCrown(fromSquare) : fromSquare;
+                        fromSquare = (isCorner(to / 10)) ? makeCrown(fromSquare) : fromSquare;
 
                         playingBoard.put(from, toSquare);
                         playingBoard.put(to, fromSquare);
@@ -132,9 +132,6 @@ public class CheckersArrayAdapter<T> extends ArrayAdapter<Squares> {
         Boolean isCrown = playingBoard.get(position).isCrown();
         if (s.startsWith(Constants.LIGHT)) {
             rowView = inflater.inflate(R.layout.item_light, parent, false);
-            if (isCrown) {
-                rowView = setCrownText(rowView);
-            }
         } else if (s.startsWith(Constants.BLUE)) {
             rowView = inflater.inflate(R.layout.item_blue, parent, false);
             if (isCrown) {
@@ -145,6 +142,8 @@ public class CheckersArrayAdapter<T> extends ArrayAdapter<Squares> {
             if (isCrown) {
                 rowView = setCrownText(rowView);
             }
+        } else if (s.startsWith(Constants.SIMPLE)) {
+            rowView = inflater.inflate(R.layout.item_simple, parent, false);
         }
         return rowView;
     }
